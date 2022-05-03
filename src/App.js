@@ -11,7 +11,8 @@ import { Chart as ChartJS } from 'chart.js/auto'
 import { Chart }            from 'react-chartjs-2'
 import SelectButton from "./components/SelectButton";
 import { chartDays } from "./config/data";
-import { Volume } from "./config/api";
+import { Volume, DeribitVol} from "./config/api";
+
 
 function App () {
   const [historicData, setHistoricData] = useState();
@@ -21,11 +22,13 @@ function App () {
   const [binance, setBinance] = useState();
   const [ftx, setFtx] = useState([]);
   const [okex, setOkex] = useState([]);
+  const [btc, setBtc] = useState([]);
+  const [eth, setEth] = useState([]);
 
 
   const useStyles = makeStyles((theme) => ({
     container: {
-      width: "80%",
+      width: "90%",
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
@@ -73,16 +76,17 @@ function App () {
     setOkex(data);
   };
 
-  
+  const fetchBtc = async () => {
+    const { data } = await axios.get(DeribitVol("btc"));
+    setflag(true);
+    setBtc(data);
+  };
 
-
-  //console.log(historicData);
-  //console.log(huobi);
-  //console.log(binance);
-  //console.log(ftx);
-  //console.log(okex);
-  //console.log(okex.length);
-  
+  const fetchEth = async () => {
+    const { data } = await axios.get(DeribitVol("eth"));
+    setflag(true);
+    setEth(data);
+  };
 
   useEffect(() => {
     fetchHistoricData();
@@ -90,33 +94,69 @@ function App () {
     fetchBinance();
     fetchFtx();
     fetchOkex();
+    fetchBtc();
+    fetchEth();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [days]);
 
+  //console.log(parseFloat(btc.data?.[0].options_daily) + parseFloat(btc.data?.[0].futures) + parseFloat(btc.data?.[0].perpetual))
+  //console.log(btc)
+  //console.log(ftx)
+  //console.log(okex)
 
+  console.log(okex.length)
+  console.log(btc);
   var test = [];
   var r = []; //result
   var i, l = okex?.length
   r.length = l;
   test.length =l;
   
+
+  
   for(i = 0; i < l; i = i +1) {
-    r[i] = [okex?.[i][0], parseFloat(ftx?.[i]?.[1])+parseFloat(historicData?.[i]?.[1]) 
+    var x=[];
+    var testing = historicData?.[i]?.[0];
+    var a = new Date(testing);
+    var year = a.getFullYear();
+    var month = ('0' + (a.getMonth()+1)).slice(-2);
+    var dias = ('0' + a.getDate()).slice(-2);
+    var time = year + '-' + month + '-' + dias;
+    //console.log(btc.data?.[i].volume_date)
+      
+    var d,e,f, t=[];
+    var id
+    //let index =btc.data?.[i].indexOf(time)
+    //console.log(index);
+    for(var y = 0; y < btc.data?.length; y = y +1){
+      d=btc.data?.[y];
+      t[d.volume_date] = d
+      //e=eth.data?.[y];
+      //f[e.volume_date]= e
+
+      }
+      console.log(t);
+     // if (t===t?.time){
+
+        //x=parseFloat(t?.options_daily) + parseFloat(t?.futures) + parseFloat(t?.perpetual)
+      //}
+      
+      x=parseFloat(t?.[time]?.options_daily) + parseFloat(t?.[time]?.futures) + parseFloat(t?.[time]?.perpetual)
+
+     
+       
+
+    
+    
+  
+  r[i] = [okex?.[i][0], parseFloat(ftx?.[i]?.[1])+parseFloat(historicData?.[i]?.[1]) 
     +parseFloat(huobi?.[i]?.[1])
     +parseFloat(binance?.[i]?.[1])
     +parseFloat(okex?.[i]?.[1])];
-    test[i] = [okex?.[i][0], parseFloat(historicData?.[i]?.[1])/r?.[i]?.[1]*100];
+    test[i] = [okex?.[i][0], (parseFloat(historicData?.[i]?.[1])+x)/r?.[i]?.[1]*100];
   }
-  console.log(r);
-  console.log(test);
-  console.log(ftx?.length)
-  console.log(binance?.length)
-  console.log(huobi?.length)
-  console.log(historicData?.length)
-
-  //parseFloat(okex?.[i][1])+parseFloat(ftx?.[i][1])+parseFloat(huobi?.[i][1])+parseFloat(binance?.[i][1])
-  //parseFloat(historicData?.[i][1])/r?.[i][1]*100
   
+
   const darkTheme = createTheme({
     palette: {
       primary: {
