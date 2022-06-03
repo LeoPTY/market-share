@@ -11,7 +11,7 @@ import { Chart as ChartJS } from 'chart.js/auto'
 import { Chart }            from 'react-chartjs-2'
 import SelectButton from "./components/SelectButton";
 import { chartDays } from "./config/data";
-import { Volume, DeribitVol} from "./config/api";
+import { Volume, DeribitVol, ethPrice} from "./config/api";
 
 
 function App () {
@@ -22,13 +22,18 @@ function App () {
   const [binance, setBinance] = useState();
   const [ftx, setFtx] = useState([]);
   const [okex, setOkex] = useState([]);
+  const [bybit, setBybit] = useState([]);
+  const [bitmex, setBitmex] = useState([]);
   const [btc, setBtc] = useState([]);
   const [eth, setEth] = useState([]);
+  const [ethprice, setEthPrice] = useState([]);
+  const [count, setCount] = useState(0);
+  //bitmex, bybit, 
 
 
   const useStyles = makeStyles((theme) => ({
     container: {
-      width: "90%",
+      width: "80%",
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
@@ -76,6 +81,18 @@ function App () {
     setOkex(data);
   };
 
+  const fetchBybit = async () => {
+    const { data } = await axios.get(Volume("bybit", days));
+    setflag(true);
+    setBybit(data);
+  };
+
+  const fetchBitmex = async () => {
+    const { data } = await axios.get(Volume("bitmex", days));
+    setflag(true);
+    setBitmex(data);
+  };
+
   const fetchBtc = async () => {
     const { data } = await axios.get(DeribitVol("btc"));
     setflag(true);
@@ -88,6 +105,12 @@ function App () {
     setEth(data);
   };
 
+  const fetchEthPrice = async () => {
+    const { data } = await axios.get(ethPrice(count));
+    setflag(true);
+    setEthPrice(data);
+  };
+
   useEffect(() => {
     fetchHistoricData();
     fetchHuobi();
@@ -96,23 +119,37 @@ function App () {
     fetchOkex();
     fetchBtc();
     fetchEth();
+    fetchBybit();
+    fetchBitmex();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [days]);
+
+  useEffect(() => {
+
+    fetchEthPrice();
+  }, [count]);
 
   //console.log(parseFloat(btc.data?.[0].options_daily) + parseFloat(btc.data?.[0].futures) + parseFloat(btc.data?.[0].perpetual))
   //console.log(btc)
   //console.log(ftx)
   //console.log(okex)
 
-  console.log(okex.length)
-  console.log(btc);
+  //console.log(okex.length)
+  //console.log(btc);
   var test = [];
+  var trying = [];
   var r = []; //result
   var i, l = okex?.length
   r.length = l;
   test.length =l;
   
-
+  console.log(ethprice);
+  for (var u=0; u<ethprice?.records_total; u+100){
+    setCount(u+100);
+    trying = trying + ethprice;
+    console.log(ethprice);
+  }
+  console.log(trying);
   
   for(i = 0; i < l; i = i +1) {
     var x=[];
@@ -125,9 +162,9 @@ function App () {
     //console.log(btc.data?.[i].volume_date)
       
     var d,e,f, t=[];
-    var id
+
     //let index =btc.data?.[i].indexOf(time)
-    //console.log(index);
+
     for(var y = 0; y < btc.data?.length; y = y +1){
       d=btc.data?.[y];
       t[d.volume_date] = d
@@ -135,7 +172,7 @@ function App () {
       //f[e.volume_date]= e
 
       }
-      console.log(t);
+      //console.log(t);
      // if (t===t?.time){
 
         //x=parseFloat(t?.options_daily) + parseFloat(t?.futures) + parseFloat(t?.perpetual)
@@ -149,10 +186,14 @@ function App () {
     
     
   
-  r[i] = [okex?.[i][0], parseFloat(ftx?.[i]?.[1])+parseFloat(historicData?.[i]?.[1]) 
+  r[i] = [okex?.[i][0], parseFloat(ftx?.[i]?.[1])
+    +parseFloat(historicData?.[i]?.[1]) 
     +parseFloat(huobi?.[i]?.[1])
     +parseFloat(binance?.[i]?.[1])
-    +parseFloat(okex?.[i]?.[1])];
+    +parseFloat(okex?.[i]?.[1])
+    +parseFloat(bybit?.[i]?.[1])
+    +parseFloat(bitmex?.[i]?.[1])
+    +x];
     test[i] = [okex?.[i][0], (parseFloat(historicData?.[i]?.[1])+x)/r?.[i]?.[1]*100];
   }
   
