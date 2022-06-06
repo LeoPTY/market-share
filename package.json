@@ -18,7 +18,8 @@
     "react-router-dom": "^6.3.0",
     "react-scripts": "5.0.0",
     "web-vitals": "^2.1.4"
-  },"proxy":"https://cat-fact.herokuapp.com/",
+  },
+  "proxy": "http://18.193.105.218/",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",

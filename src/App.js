@@ -28,7 +28,6 @@ function App () {
   const [eth, setEth] = useState([]);
   const [ethprice, setEthPrice] = useState([]);
   const [count, setCount] = useState(0);
-  //bitmex, bybit, 
 
 
   const useStyles = makeStyles((theme) => ({
@@ -94,16 +93,21 @@ function App () {
   };
 
   const fetchBtc = async () => {
-    const { data } = await axios.get(DeribitVol("btc"));
+    const { data } = await axios.get(DeribitVol("btc"),{
+     headers:{'Access-Control-Allow-Origin':'*'}
+    });
     setflag(true);
     setBtc(data);
   };
 
   const fetchEth = async () => {
-    const { data } = await axios.get(DeribitVol("eth"));
+    const { data } = await axios.get(DeribitVol("eth"),{
+      headers:{'Access-Control-Allow-Origin':'*'}
+    });
     setflag(true);
     setEth(data);
   };
+
 
   const fetchEthPrice = async () => {
     const { data } = await axios.get(ethPrice(count));
