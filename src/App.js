@@ -93,17 +93,13 @@ function App () {
   };
 
   const fetchBtc = async () => {
-    const { data } = await axios.get(DeribitVol("btc"),{
-     headers:{'Access-Control-Allow-Origin':'*'}
-    });
+    const { data } = await axios.get(DeribitVol("btc"));
     setflag(true);
     setBtc(data);
   };
 
   const fetchEth = async () => {
-    const { data } = await axios.get(DeribitVol("eth"),{
-      headers:{'Access-Control-Allow-Origin':'*'}
-    });
+    const { data } = await axios.get(DeribitVol("eth"));
     setflag(true);
     setEth(data);
   };
