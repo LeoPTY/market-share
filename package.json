@@ -2,6 +2,7 @@
   "name": "deribit-market",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://18.193.105.218/",
   "dependencies": {
     "@material-ui/core": "^4.12.4",
     "@material-ui/lab": "^4.0.0-alpha.61",
@@ -19,7 +20,7 @@
     "react-scripts": "5.0.0",
     "web-vitals": "^2.1.4"
   },
-  "proxy": "http://18.193.105.218/",
+
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",

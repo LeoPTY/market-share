@@ -93,13 +93,23 @@ function App () {
   };
 
   const fetchBtc = async () => {
-    const { data } = await axios.get(DeribitVol("btc"));
+    const { data } = await axios.get(DeribitVol("btc"), {
+      headers: {
+        'Access-Control-Allow-Origin' : '*',
+        'Access-Control-Allow-Methods':'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+      }
+    });
     setflag(true);
     setBtc(data);
   };
 
   const fetchEth = async () => {
-    const { data } = await axios.get(DeribitVol("eth"));
+    const { data } = await axios.get(DeribitVol("eth"), {
+      headers: {
+        'Access-Control-Allow-Origin' : '*',
+        'Access-Control-Allow-Methods':'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+      }
+    });
     setflag(true);
     setEth(data);
   };
@@ -124,18 +134,11 @@ function App () {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [days]);
 
-  useEffect(() => {
+  /*useEffect(() => {
 
     fetchEthPrice();
   }, [count]);
-
-  //console.log(parseFloat(btc.data?.[0].options_daily) + parseFloat(btc.data?.[0].futures) + parseFloat(btc.data?.[0].perpetual))
-  //console.log(btc)
-  //console.log(ftx)
-  //console.log(okex)
-
-  //console.log(okex.length)
-  //console.log(btc);
+*/
   var test = [];
   var trying = [];
   var r = []; //result
@@ -159,32 +162,16 @@ function App () {
     var month = ('0' + (a.getMonth()+1)).slice(-2);
     var dias = ('0' + a.getDate()).slice(-2);
     var time = year + '-' + month + '-' + dias;
-    //console.log(btc.data?.[i].volume_date)
       
     var d,e,f, t=[];
-
-    //let index =btc.data?.[i].indexOf(time)
 
     for(var y = 0; y < btc.data?.length; y = y +1){
       d=btc.data?.[y];
       t[d.volume_date] = d
-      //e=eth.data?.[y];
-      //f[e.volume_date]= e
-
       }
-      //console.log(t);
-     // if (t===t?.time){
-
-        //x=parseFloat(t?.options_daily) + parseFloat(t?.futures) + parseFloat(t?.perpetual)
-      //}
-      
+   
       x=parseFloat(t?.[time]?.options_daily) + parseFloat(t?.[time]?.futures) + parseFloat(t?.[time]?.perpetual)
 
-     
-       
-
-    
-    
   
   r[i] = [okex?.[i][0], parseFloat(ftx?.[i]?.[1])
     +parseFloat(historicData?.[i]?.[1]) 
@@ -196,7 +183,7 @@ function App () {
     +x];
     test[i] = [okex?.[i][0], (parseFloat(historicData?.[i]?.[1])+x)/r?.[i]?.[1]*100];
   }
-  
+
 
   const darkTheme = createTheme({
     palette: {
