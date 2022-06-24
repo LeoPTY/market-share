@@ -11,12 +11,12 @@ import { Chart as ChartJS } from 'chart.js/auto'
 import { Chart }            from 'react-chartjs-2'
 import SelectButton from "./components/SelectButton";
 import { chartDays } from "./config/data";
-import { Volume, DeribitVol, ethPrice} from "./config/api";
+import { Volume, DeribitVol, ethPrice, btcPrice} from "./config/api";
 
 
 function App () {
   const [historicData, setHistoricData] = useState();
-  const [days, setDays] = useState(7);
+  const [days, setDays] = useState(30);
   const [flag,setflag] = useState(false);
   const [huobi, setHuobi] = useState();
   const [binance, setBinance] = useState();
@@ -27,7 +27,8 @@ function App () {
   const [btc, setBtc] = useState([]);
   const [eth, setEth] = useState([]);
   const [ethprice, setEthPrice] = useState([]);
-  const [count, setCount] = useState(0);
+  const [btcprice, setBtcPrice] = useState([]);
+  const [count, setCount] = useState(30);
 
 
   const useStyles = makeStyles((theme) => ({
@@ -42,7 +43,7 @@ function App () {
       [theme.breakpoints.down("md")]: {
         width: "100%",
         marginTop: 0,
-        padding: 20,
+        padding: 30,
         paddingTop: 0,
       },
     },
@@ -116,9 +117,15 @@ function App () {
 
 
   const fetchEthPrice = async () => {
-    const { data } = await axios.get(ethPrice(count));
+    const { data } = await axios.get(ethPrice(days));
     setflag(true);
     setEthPrice(data);
+  };
+
+  const fetchBtcPrice = async () => {
+    const { data } = await axios.get(btcPrice(days));
+    setflag(true);
+    setBtcPrice(data);
   };
 
   useEffect(() => {
@@ -131,14 +138,12 @@ function App () {
     fetchEth();
     fetchBybit();
     fetchBitmex();
+    fetchEthPrice();
+    fetchBtcPrice();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [days]);
 
-  /*useEffect(() => {
 
-    fetchEthPrice();
-  }, [count]);
-*/
   var test = [];
   var trying = [];
   var r = []; //result
@@ -146,16 +151,19 @@ function App () {
   r.length = l;
   test.length =l;
   
-  console.log(ethprice);
+  /*console.log(ethprice);
   for (var u=0; u<ethprice?.records_total; u+100){
     setCount(u+100);
     trying = trying + ethprice;
     console.log(ethprice);
   }
+
+  */
   console.log(trying);
+  console.log(okex)
+
   
   for(i = 0; i < l; i = i +1) {
-    var x=[];
     var testing = historicData?.[i]?.[0];
     var a = new Date(testing);
     var year = a.getFullYear();
@@ -163,14 +171,38 @@ function App () {
     var dias = ('0' + a.getDate()).slice(-2);
     var time = year + '-' + month + '-' + dias;
       
-    var d,e,f, t=[];
+    var d,e,price_eth=[], price_btc=[], x, m;
 
     for(var y = 0; y < btc.data?.length; y = y +1){
       d=btc.data?.[y];
-      t[d.volume_date] = d
+      price_btc[d.volume_date] = d
       }
    
-      x=parseFloat(t?.[time]?.options_daily) + parseFloat(t?.[time]?.futures) + parseFloat(t?.[time]?.perpetual)
+      x=parseFloat(price_btc?.[time]?.options_daily) + 
+      parseFloat(price_btc?.[time]?.futures) + 
+      parseFloat(price_btc?.[time]?.perpetual)
+      //console.log(xo)
+
+      var pricediff=[];
+      for(var z = 0; z < ethprice?.result?.data?.length; z = z +1){
+        if(ethprice?.result?.data?.[z]?.date === btcprice?.result?.data?.[z]?.date){
+          pricediff[z] = btcprice?.result?.data?.[z]?.delivery_price/ethprice?.result?.data?.[z]?.delivery_price
+        }
+      }
+
+      //console.log(pricediff)
+      for(var o = 0; o < eth.data?.length; o = o +1){
+        e=eth.data?.[o];
+        price_eth[e.volume_date] = e
+        }
+        m=((parseFloat(price_eth?.[time]?.options_daily) + 
+        parseFloat(price_eth?.[time]?.futures) + 
+        parseFloat(price_eth?.[time]?.perpetual))/pricediff[i])
+        m = m?m:0;
+        console.log(m)
+      
+     // m =Array.from(a, item => item || 0);
+      
 
   
   r[i] = [okex?.[i][0], parseFloat(ftx?.[i]?.[1])
@@ -180,9 +212,13 @@ function App () {
     +parseFloat(okex?.[i]?.[1])
     +parseFloat(bybit?.[i]?.[1])
     +parseFloat(bitmex?.[i]?.[1])
-    +x];
-    test[i] = [okex?.[i][0], (parseFloat(historicData?.[i]?.[1])+x)/r?.[i]?.[1]*100];
+    +x+m];
+    test[i] = [okex?.[i][0], (parseFloat(historicData?.[i]?.[1])+x+m)/r?.[i]?.[1]*100];
   }
+
+  //get price of eth that day using delivery prices endpoint
+  //get price of btc that day using delivery prices endpoint
+  //get the difference between the two prices and multiply eth volume by that difference.
 
 
   const darkTheme = createTheme({
@@ -195,6 +231,7 @@ function App () {
   });
 
   return (
+    
     <ThemeProvider theme={darkTheme}>
       <div className={classes.container}>
         {!historicData | flag===false ? (
@@ -221,6 +258,7 @@ function App () {
                     data: test.map((exchange) => exchange[1]),
                     label: `Market Share ( Past ${days} Days ) in %`,
                     borderColor: "#2DAE9A",
+                    lineTension:0.6
                   },
                 ],
               }}
@@ -236,6 +274,7 @@ function App () {
               style={{
                 display: "flex",
                 marginTop: 20,
+                marginRight:0,
                 justifyContent: "space-around",
                 width: "100%",
               }}
@@ -254,7 +293,20 @@ function App () {
             </div>
           </>
         )}
+        <div>
+        <h3>
+          We query the data from multiple exchanges via coingecko API, exchanges currently used: FTX, Binance, Bitmex, OKEX, Bybit, Huobi.
+        </h3>
+        <h3>
+          We then add the volume for each day and we utilize our internal data in order to get our volume percentage. basically volume% = DeribitVolume/TotalVolume*100
+        </h3>
+        <h3>
+          Where DeribitVolume is the volume of the day in Deribit and TotalVolume is the total volume of the day in all exchanges.
+        </h3>
+        
       </div>
+      </div>
+      
     </ThemeProvider>
   );
 };
