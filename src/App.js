@@ -12,6 +12,7 @@ import { Chart }            from 'react-chartjs-2'
 import SelectButton from "./components/SelectButton";
 import { chartDays } from "./config/data";
 import { Volume, DeribitVol, ethPrice, btcPrice} from "./config/api";
+import Header from "./components/Header";
 
 
 function App () {
@@ -282,9 +283,7 @@ function App () {
               {chartDays.map((day) => (
                 <SelectButton
                   key={day.value}
-                  onClick={() => {setDays(day.value);
-                    setflag(false);
-                  }}
+                  
                   selected={day.value === days}
                 >
                   {day.label}
