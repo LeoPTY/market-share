@@ -12,7 +12,6 @@ import { Chart }            from 'react-chartjs-2'
 import SelectButton from "./components/SelectButton";
 import { chartDays } from "./config/data";
 import { Volume, DeribitVol, ethPrice, btcPrice} from "./config/api";
-import Header from "./components/Header";
 
 
 function App () {
